@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import datetime
 import mysql.connector
 import json
@@ -70,10 +71,20 @@ def get_group_to_template (central, group_list):
             group_to_template_dict[gp]='none'
     return group_to_template_dict 
 
-central_info = test_central()
-#print("--------------")
-#print(central_info)
-#print("--------------")
+#-------------------------------------------
+# MAIN()
+#-------------------------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument('--userID', \
+                     default = 'scraper', \
+                     help='Central Tools user ID to use for API access')
+args = parser.parse_args()
+userID = args.userID
+print("Accessing API as " + userID)
+central_info = test_central(userID)
+print("--------------")
+print(central_info)
+print("--------------")
 
 ssl_verify=True
 # set Central data
@@ -97,8 +108,8 @@ for i in data_dict:
   model = ""
   template_hash = ""
   version = ""
-
-  if (data_dict[i] != 'none'):
+  print(data_dict[i])
+  if ((data_dict[i] != 'none') and (data_dict[i] != [])):
     device_type = data_dict[i][0]['device_type']
     group_name = data_dict[i][0]['group']
     model = data_dict[i][0]['model']

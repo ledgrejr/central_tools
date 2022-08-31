@@ -77,6 +77,7 @@ def get_inventory (central,type, loop_limit=0):
         }
 
         response = s.request("GET", api_function_url, headers=qheaders, params=qparams)
+#        print(response.json())
         if response.json()['devices'] != []:
             device_list = device_list + response.json()['devices']
             offset += limit
@@ -108,6 +109,7 @@ def get_cfg_details_aps (serial):
             FROM central_tools.aps\
             JOIN central_tools.templates ON aps.group_name = templates.group_name \
             WHERE aps.serial = '{0}'".format(serial); 
+    print(query)
 
     cursor2.execute(query)
     row=cursor2.fetchone()
@@ -176,9 +178,9 @@ userID = args.userID
 print(dev_type)
 print("Accessing API as " + userID)
 central_info = test_central(userID)
-#print("--------------")
-#print(central_info)
-#print("--------------")
+print("--------------")
+print(central_info)
+print("--------------")
 
 ssl_verify=True
 # set Central data
@@ -194,8 +196,9 @@ if dev_type == "all_controller":
   data_dict = get_inventory(central,"all_controller") + data_dict
 if dev_type == "all_gateway":
   data_dict = get_inventory(central,"gateway") + data_dict
-if dev_type == "all_vgw":
-  data_dict = get_inventory(central,"vgw") + data_dict
+#dev type vgw is currently broken in central 2.5.5 - 08/29/2022
+#if dev_type == "all_vgw":
+#  data_dict = get_inventory(central,"vgw") + data_dict
 if dev_type == "all_cap":
   data_dict = get_inventory(central,"cap") + data_dict
 if dev_type == "all_others":
@@ -205,7 +208,9 @@ if dev_type == "ALL":
   data_dict = get_inventory(central,"all_ap") + data_dict
   data_dict = get_inventory(central,"all_controller") + data_dict
   data_dict = get_inventory(central,"gateway") + data_dict
-  data_dict = get_inventory(central,"vgw") + data_dict
+#dev type vgw is currently broken in central 2.5.5 - 08/29/2022
+#if dev_type == "all_vgw":
+#  data_dict = get_inventory(central,"vgw") + data_dict
   data_dict = get_inventory(central,"cap") + data_dict
   data_dict = get_inventory(central,"others") + data_dict
 
@@ -227,12 +232,12 @@ if (len(data_dict) > 0):
     services = json.dumps(i['services'])
     tier_type = i['tier_type']
 
-    if device_type == "switch":
+    if (device_type == "switch") or (device_type == "SWITCH"):
       data2 = get_cfg_details_switch(serial)
       group_name = data2['group_name']
       template_name = data2['template_name']
       template_hash = data2['template_hash']
-    elif device_type == "iap":
+    elif (device_type == "iap") or (device_type == "AP"):
       data2 = get_cfg_details_aps(serial)
       group_name = data2['group_name']
       template_name = data2['template_name']

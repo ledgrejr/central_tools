@@ -18,6 +18,7 @@
 --
 -- Table structure for table `menus`
 --
+USE central_tools_admin;
 
 DROP TABLE IF EXISTS `menus`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -43,7 +44,7 @@ CREATE TABLE `menus` (
 
 LOCK TABLES `menus` WRITE;
 /*!40000 ALTER TABLE `menus` DISABLE KEYS */;
-INSERT INTO `menus` VALUES (2,'Section 9','/',NULL,3,NULL),(3,'Motoko Kusanagi','/',NULL,1,2),(4,'Batou','/',NULL,1,2),(5,'Togusa','/',NULL,1,2),(6,'Ishikawa','/',NULL,1,2),(7,'Pazu','/',NULL,1,2),(8,'Boma','/',NULL,1,2),(9,'Saito','/',NULL,1,2),(10,'Tachikoma','/',NULL,1,3),(11,'Babylon 5','/',1,3,NULL),(12,'John Sheridan','/',NULL,1,11),(20,'Michael Garibaldi','/security/',NULL,1,12),(21,'Susan Ivanova','/',3,1,12),(22,'Operations','/',NULL,3,12),(24,'Tasks','/',1,3,NULL),(25,'Create Template Group & Upload Templatee','create_tgroup/',NULL,1,24),(26,'Create Multi TG and Upload Template','create_mtgroup/',NULL,1,24),(27,'Show Sites','show_sites/',NULL,1,24),(28,'Update Vars','WF1select_site/',NULL,1,24),(29,'Device Config','WFcfg_select_site/',NULL,1,24),(30,'Zocolo','/',NULL,3,11),(31,'Jack\'s Used Ships','/',NULL,1,30),(32,'SQL Query','WFsql/',NULL,1,24);
+INSERT INTO `menus` VALUES (2,'Section 9','/',NULL,3,NULL),(3,'Motoko Kusanagi','/',NULL,1,2),(4,'Batou','/',NULL,1,2),(5,'Togusa','/',NULL,1,2),(6,'Ishikawa','/',NULL,1,2),(7,'Pazu','/',NULL,1,2),(8,'Boma','/',NULL,1,2),(9,'Saito','/',NULL,1,2),(10,'Tachikoma','/',NULL,1,3),(11,'Babylon 5','/',1,3,NULL),(12,'John Sheridan','/',NULL,1,11),(20,'Michael Garibaldi','/security/',NULL,1,12),(21,'Susan Ivanova','/',3,1,12),(22,'Operations','/',NULL,3,12),(24,'Tasks','/',1,3,NULL),(25,'Create Template Group & Upload Templatee','/create_tgroup/',NULL,1,24),(26,'Create Multi TG and Upload Template','/create_mtgroup/',NULL,1,24),(27,'Show Sites','/show_sites/',NULL,1,24),(28,'Update Vars','/WF1select_site/',NULL,1,24),(29,'Device Config','/WFcfg_select_site/',NULL,1,24),(30,'Zocolo','/',NULL,3,11),(31,'Jack\'s Used Ships','/',NULL,1,30),(32,'SQL Query','/WFsql/',NULL,1,24);
 /*!40000 ALTER TABLE `menus` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

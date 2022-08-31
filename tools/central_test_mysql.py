@@ -95,6 +95,5 @@ def test_central(scraperID = "scraper"):
   cnx.close()
   return central_info_func
   
-#print(test_central())
  
 

@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.views import View
@@ -127,7 +128,8 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     success_url = reverse_lazy('home')
 
 
-class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+#@login_required(login_url="/login/")
+class ChangePasswordView(LoginRequiredMixin, SuccessMessageMixin, PasswordChangeView):
     template_name = 'home/change_password.html'
     success_message = "Successfully Changed Your Password"
     success_url = reverse_lazy('home')

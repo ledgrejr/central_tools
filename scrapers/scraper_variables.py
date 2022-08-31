@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import datetime
 import mysql.connector
 import json
@@ -53,10 +54,20 @@ def get_all_variables (central,loop_limit=0):
             need_more = False
     return full_variable_dict
 
-central_info = test_central()
-#print("--------------")
-#print(central_info)
-#print("--------------")
+#----------------------------------
+# MAIN()
+#----------------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument('--userID', \
+                    default = 'scraper', \
+                    help='Central Tools user ID to use for API access')
+args = parser.parse_args()
+userID = args.userID
+print("Accessing API as " + userID)
+central_info = test_central(userID)
+print("--------------")
+print(central_info)
+print("--------------")
 
 ssl_verify=True
 # set Central data

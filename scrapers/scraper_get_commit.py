@@ -36,13 +36,15 @@ def sqlescape(string):
 def sqlboolean(bool_val):
    return(int(bool_val == True))
 
-def get_DB_devices ():
+def get_DB_devices (central):
     # set initial vars
     print ("Getting devices from database")
     cnx2 = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
     cursor2 = cnx2.cursor()
 
-    query = "SELECT serial,site_name, NULL as last_refreshed FROM central_tools.devices"
+    query = "SELECT serial,site_name, NULL as last_refreshed FROM central_tools.devices \
+                    WHERE customer_id = '{1}'".format(type,central['customer_id']);
+
     cursor2.execute(query)
     row_headers=[x[0] for x in cursor2.description] #this will extract row headers
     rv = cursor2.fetchall()
@@ -166,9 +168,9 @@ if (not central_info):
    if (not central_info):
      exit(1)
 
-#print("--------------")
-#print(central_info)
-#print("--------------")
+print("--------------")
+print(central_info)
+print("--------------")
 
 ssl_verify=True
 # set Central data
@@ -177,7 +179,7 @@ customer_id = central_info['customer_id']
     
 # get all device variables - this call takes some time
 data_dict =[] 
-data_dict = get_DB_devices()
+data_dict = get_DB_devices(central_info)
 
 cnx = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
 cursor = cnx.cursor()
