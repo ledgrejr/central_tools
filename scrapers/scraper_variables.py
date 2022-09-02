@@ -6,6 +6,7 @@ import mysql.connector
 import json
 import requests
 import copy
+import re
 from pycentral.base import ArubaCentralBase
 from pycentral.configuration import Variables
 from central_test_mysql import test_central
@@ -76,7 +77,7 @@ central = ArubaCentralBase(central_info=central_info, ssl_verify=ssl_verify)
 # get all device variables - this call takes some time
 data_dict = get_all_variables (central)
 #for testing, uncomment the next like and comment the above line
-#data_dict = get_variables (central,'SG23KMX00R')
+#data_dict = get_variables (central,'CNMFKV30X3')
 print(data_dict)
 cnx = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
 cursor = cnx.cursor()
@@ -87,7 +88,12 @@ for i in data_dict:
     serial = i 
     for j in data_dict[i]:
       variable_name = j
-      value = data_dict[i][j]
+      if (isinstance(data_dict[i][j],str)):
+#        print("is string")
+        value = re.sub(r'\\$','',data_dict[i][j])
+      else:
+        print("is snot tring")
+        value = data_dict[i][j]
       if (value == "'"):
         value = "\"\""
       

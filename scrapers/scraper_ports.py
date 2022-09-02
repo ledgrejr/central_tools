@@ -192,7 +192,7 @@ if (len(data_dict) > 0):
         data2 = get_switch_port_details (central,serial)
     elif data2['status_code'] == 500:
         print("Got the dreaded Internal Server Error...sleeping 10 seconds and trying again")
-        sleep(10)
+        time.sleep(10)
         data2 = get_switch_port_details (central,serial)
   
 #    print(data2)
