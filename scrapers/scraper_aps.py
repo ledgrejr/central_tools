@@ -53,7 +53,7 @@ def get_aps (central, loop_limit=0):
     s = requests.Session()
     retries = Retry(total=5,
     backoff_factor=1,
-    status_forcelist=[ 502, 503, 504 ])
+    status_forcelist=[ 500, 502, 503, 504 ])
     s.mount('https://', HTTPAdapter(max_retries=retries))
     s.mount('http://', HTTPAdapter(max_retries=retries))
 

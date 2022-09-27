@@ -262,7 +262,7 @@ def create_tgroup(request):
          fs = FileSystemStorage()
          filename = fs.save('templates/' + myfile.name, myfile)
 
-         TgroupName = request.POST.get('Tgroup_name')
+         TgroupName = request.POST.get('Tgroup_name').strip()
          TgroupTypes = request.POST.getlist('TgroupTypes')
          TDevType = request.POST.get('TDevType')
          Tmodel = request.POST.get('Tmodel')
@@ -325,7 +325,7 @@ def create_tgroup(request):
             #make API call to add the template to the group         
             #**********************************
             api_url = central_url + "/configuration/v1/groups/" + TgroupName + "/templates"
-
+            print(api_url)
             # do not put 'Content-Type': 'application/json' in the headers.  It will cause fordata errors
             qheaders={
                "Authorization": "Bearer " + access_token,
@@ -415,7 +415,7 @@ def create_mtgroup(request):
          fs = FileSystemStorage()
          filename = fs.save('templates/' + myfile.name, myfile)
 
-         TgroupName = request.POST.get('Tgroup_name')
+         TgroupName = request.POST.get('Tgroup_name').strip()
          TgroupRange = request.POST.get('Tgroup_range')
          TgroupTypes = request.POST.getlist('TgroupTypes')
          TDevType = request.POST.get('TDevType')

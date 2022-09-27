@@ -50,18 +50,25 @@ def get_all_groups (central,loop_limit=0):
 
     while need_more:
         response = g.get_groups(central,offset=counter,limit=limit)
-        if response['msg']['data'] != []:
-            full_group_list = full_group_list + response['msg']['data']
-        elif response['msg']['data'] == []:
-            need_more = False
-            break
+#        print(response)
+        if (response['code'] == 200):
+          if response['msg']['data'] != []:
+              full_group_list = full_group_list + response['msg']['data']
+          elif response['msg']['data'] == []:
+              need_more = False
+              break
+          else:
+              print("ERROR")
+              need_more = False
+              print(response)
+              break
+          counter = counter + limit
+          print(counter)
+        elif (response['code'] == 500):
+           print("Internal error...trying again")
         else:
-            print("ERROR")
-            need_more = False
-            print(response)
-            break
-        counter = counter + limit
-        print(counter)
+           print(response)
+
 
 #exit the function after loop_limit runs...for testing 
         if (loop_limit != 0):
@@ -80,7 +87,7 @@ def get_group_properties (central_info,group):
     s = requests.Session()
     retries = Retry(total=5,
     backoff_factor=1,
-    status_forcelist=[ 502, 503, 504 ])
+    status_forcelist=[ 500, 502, 503, 504 ])
     s.mount('https://', HTTPAdapter(max_retries=retries))
     s.mount('http://', HTTPAdapter(max_retries=retries))
 

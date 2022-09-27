@@ -36,6 +36,11 @@ def sqlescape(string):
 def sqlboolean(bool_val):
    return(int(bool_val == True))
 
+def check_int(input):
+   if (input == None):
+     return(0)
+   else:
+     return(input)
 
 def get_switches (central, loop_limit=0):
     # set initial vars
@@ -95,8 +100,8 @@ def get_switch_details (central, serial, loop_limit=0):
 
     s = requests.Session()
 
-    retries = Retry(total=5,
-                backoff_factor=1,
+    retries = Retry(total=10,
+                backoff_factor=3,
                 status_forcelist=[ 502, 503, 504 ])
 
     s.mount('https://', HTTPAdapter(max_retries=retries))
@@ -137,7 +142,7 @@ def get_switch_details (central, serial, loop_limit=0):
        print(response.text)
        result_str = '{"chassis_type": "False", "cpu_utilization": 0, "default_gateway": "na", "device_mode": 0, "fan_speed": "Ok", "firmware_version": "na", "group_name": "na", "ip_address": "na", "labels": [], "macaddr": "na", "max_power": 0, "mem_free": 0, "mem_total": 0, "model": "na", "name": "na", "poe_consumption": "0", "power_consumption": 0, "na": "na", "serial": "na", "site": "na", "stack_id": "na", "status": "na", "switch_type": "na", "temperature": "0", "total_clients": 0, "updated_at": 0, "uplink_ports": [], "uptime": 0, "usage": 0}'
        j_result = json.loads(result_str)
-       error_str = '{ "Error": 404, "Error_text": Page not found"}'
+       error_str = '{ "Error": 404, "Error_text": "Page not found"}'
        response_status = '{ "status_code": ' + str(response.status_code)  + '}' 
        j_response_status = json.loads(response_status) 
        j_error = json.loads(error_str)
@@ -282,8 +287,11 @@ if (len(data_dict) > 0):
       central = ArubaCentralBase(central_info=central_info, ssl_verify=ssl_verify)
       data2 = get_switch_details(central,serial)
 
-    chassis_type = sqlboolean(data2['chassis_type'])
-    cpu_utilization = data2['cpu_utilization']
+    if ('chassis_type' in data2.keys()):
+      chassis_type = sqlboolean(data2['chassis_type'])
+    else:
+      chassis_type = "False"
+    cpu_utilization = check_int(data2['cpu_utilization'])
     default_gateway = data2['default_gateway']
     device_mode = data2['device_mode']
 
@@ -294,9 +302,9 @@ if (len(data_dict) > 0):
 
     ip_address = data2['ip_address']
     mac_address = data2['macaddr']
-    max_power = data2['max_power']
-    mem_free = data2['mem_free']
-    mem_total = data2['mem_total']
+    max_power = check_int(data2['max_power'])
+    mem_free = check_int(data2['mem_free'])
+    mem_total = check_int(data2['mem_total'])
     
     if (data2['poe_consumption'] == '-'):
        poe_consumption = 0
@@ -483,6 +491,7 @@ if (len(data_dict) > 0):
 
 #    print("------------------------")
 #    print(query)
+#    print("------------------------")
 
     cursor.execute(query)
     cnx.commit()

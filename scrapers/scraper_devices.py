@@ -54,14 +54,14 @@ def get_inventory (central,type, loop_limit=0):
 
     retries = Retry(total=5,
                 backoff_factor=1,
-                status_forcelist=[ 502, 503, 504 ])
+                status_forcelist=[ 500, 502, 503, 504 ])
 
     s.mount('https://', HTTPAdapter(max_retries=retries))
     s.mount('http://', HTTPAdapter(max_retries=retries))
 
     access_token = central_info['token']['access_token']
     base_url = central_info['base_url']
-    api_function_url = base_url + "platform/device_inventory/v1/devices"
+    api_function_url = base_url + "/platform/device_inventory/v1/devices"
     qheaders = {
       "Content-Type":"application/json",
       "Authorization": "Bearer " + access_token,

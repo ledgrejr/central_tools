@@ -36,14 +36,19 @@ def sqlescape(string):
 def sqlboolean(bool_val):
    return(int(bool_val == True))
 
-def get_DB_devices (central):
+def get_DB_devices (central, serial=None):
     # set initial vars
     print ("Getting devices from database")
     cnx2 = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
     cursor2 = cnx2.cursor()
 
-    query = "SELECT serial,site_name, NULL as last_refreshed FROM central_tools.devices \
-                    WHERE customer_id = '{1}'".format(type,central['customer_id']);
+    if (serial == None):
+      query = "SELECT serial,site_name, NULL as last_refreshed FROM central_tools.devices \
+                    WHERE customer_id = '{0}'".format(central['customer_id']);
+    else:
+      query = "SELECT serial,site_name, NULL as last_refreshed FROM central_tools.devices \
+                    WHERE serial = '{0}' AND customer_id = '{1}'".format(serial,central['customer_id']);
+      print(query)
 
     cursor2.execute(query)
     row_headers=[x[0] for x in cursor2.description] #this will extract row headers
@@ -179,6 +184,9 @@ customer_id = central_info['customer_id']
     
 # get all device variables - this call takes some time
 data_dict =[] 
+# for debug testing
+#data_dict = get_DB_devices(central_info,"CNNQKV3150")
+
 data_dict = get_DB_devices(central_info)
 
 cnx = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
@@ -206,6 +214,7 @@ if (len(data_dict) > 0):
              central_info = test_central(userID)
              if (not central_info):
                exit(1)
+          print("Retrying central auth...")
           central = ArubaCentralBase(central_info=central_info, ssl_verify=ssl_verify)
           data2 = get_device_commit_status (central,serial)
       elif data2['status_code'] == 500:
@@ -213,8 +222,8 @@ if (len(data_dict) > 0):
           time.sleep(10)
           data2 = get_device_commit_status (central,serial)
 
-#      print("---------------")
-#      print(data2)
+      print("---------------")
+      print(data2)
       serials = ''
       for j in data2['data']:
         auto_commit_state = j['auto_commit_state'] 

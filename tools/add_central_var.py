@@ -69,6 +69,32 @@ def set_variable (central_info, fname):
           print("Internal server error")
   return(response)
 
+def get_macaddr (central,serial):
+
+    cnx2 = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
+    cursor2 = cnx2.cursor()
+
+    query = "SELECT macaddr,serial,model,device_type FROM central_tools.devices \
+             WHERE serial = '{0}' AND customer_id = '{1}'".format(serial,central['customer_id']); 
+    cursor2.execute(query)
+    row_headers=[x[0] for x in cursor2.description] #this will extract row headers
+#    print(query)
+    rv = cursor2.fetchall()
+#    print(rv)
+    dict_data=[]
+    for result in rv:
+      row_result = dict(zip(row_headers,result))
+      print(row_result)
+      dict_data.append(row_result)
+
+#      print("====================")
+#      print(dict_data)
+#      print("====================")
+
+    cursor2.close()
+    cnx2.close()
+    return dict_data
+
 def get_cid_inventory (central,type,group):
 
     cnx2 = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
@@ -104,7 +130,6 @@ def get_cid_inventory (central,type,group):
     cnx2.close()
     return dict_data
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--dev_type', \
                      default = 'ALL', \
@@ -113,8 +138,9 @@ parser.add_argument('--userID', \
                      default = 'scraper', \
                      help='Central Tools user ID to use for API access')
 parser.add_argument('--group', \
-                     required=True, \
                      help='Group in which to create/update the variable')
+parser.add_argument('--infile', \
+                     help='Input file containing the serials of target devices. This prempts group selection via CLI.')
 parser.add_argument('--variable', \
                      required=True, \
                      help='Variable to create')
@@ -138,19 +164,34 @@ ssl_verify=True
 # set Central data
 central = ArubaCentralBase(central_info=central_info, ssl_verify=ssl_verify)
     
-
 data_dict = []
-if dev_type == "switch":
-  data_dict = get_cid_inventory(central_info,"SWITCH",group)
-if dev_type == "all_ap":
-  data_dict = get_cid_inventory(central_info,"AP",group)
-if dev_type == "ALL":
-  list1 = get_cid_inventory(central_info,"SWITCH",group)
-  print("list1 :",list1)
-  print("dict   :",dict)
-  data_dict.extend(list1)
-  list1 = get_cid_inventory(central_info,"AP",group)
-  data_dict.extend(list1)
+if args.infile is not None:
+  print("Load the input file: ",args.infile)
+  f = open(args.infile,"r")
+  content = f.readlines()
+
+  for line in content:
+     print("Serial #:",line)
+     list1 = get_macaddr(central_info,line.strip())
+     data_dict.extend(list1)
+   
+else:
+  if args.group is None:
+    print("You must either define a group or supply an input file to run this tool.....")
+    exit()
+
+  else:
+    if dev_type == "switch":
+      data_dict = get_cid_inventory(central_info,"SWITCH",group)
+    if dev_type == "all_ap":
+      data_dict = get_cid_inventory(central_info,"AP",group)
+    if dev_type == "ALL":
+      list1 = get_cid_inventory(central_info,"SWITCH",group)
+#      print("list1 :",list1)
+#      print("dict   :",dict)
+      data_dict.extend(list1)
+      list1 = get_cid_inventory(central_info,"AP",group)
+      data_dict.extend(list1)
 
 count = 0
 count_batches = 1
@@ -197,7 +238,11 @@ elif (response.status_code == 500):
     exit()
 
 print("Total devices: ",count*count_batches)   
-print("Adding/updating variable",new_var," to group",group)
+if args.group is not None:
+  print("Adding/updating variable",new_var," to group",group)
+else:
+  print("Adding/updating variable",new_var," to supplied list of serials in ",args.infile) 
+  
 print("With value               : ",new_value)
 
 

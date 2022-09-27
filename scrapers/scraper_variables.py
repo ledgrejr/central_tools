@@ -36,18 +36,24 @@ def get_all_variables (central,loop_limit=0):
 
     while need_more:
         response = v.get_all_template_variables(central,offset=counter,limit=limit)
-        if response['msg'] != {}:
-            full_variable_dict.update(response['msg'])
-        elif response['msg'] == {}:
-            need_more = False
-            break
-        else:
-            print("ERROR")
-            need_more = False
-            print(response)
-            break
-        counter = counter + limit
-        print(counter)
+#        print(response)
+        if (response['code'] == 200):
+          if response['msg'] != {}:
+              full_variable_dict.update(response['msg'])
+          elif response['msg'] == {}:
+              need_more = False
+              break
+          else:
+              print("ERROR")
+              need_more = False
+              print(response)
+              break
+          counter = counter + limit
+          print(counter,"Response: ",response['code'])
+        elif (response['code'] == 500):
+           print("Internal error...trying again")
+        else: 
+           print(response)
 
 #exit the function after loop_limit runs...for testing 
         if (loop_limit != 0):
@@ -76,35 +82,43 @@ central = ArubaCentralBase(central_info=central_info, ssl_verify=ssl_verify)
     
 # get all device variables - this call takes some time
 data_dict = get_all_variables (central)
-#for testing, uncomment the next like and comment the above line
-#data_dict = get_variables (central,'CNMFKV30X3')
-print(data_dict)
+#for testing, uncomment the next line and comment the above line
+#data_dict = get_variables (central,'CNMDKD50Q1')
+#print(data_dict)
 cnx = mysql.connector.connect(option_files='/etc/mysql/scraper.cnf')
 cursor = cnx.cursor()
-
 # iterate all the nested dictionaries with keys
 for i in data_dict:
   # display
     serial = i 
+#    print(serial)
+#    print(data_dict[i])
     for j in data_dict[i]:
       variable_name = j
-      if (isinstance(data_dict[i][j],str)):
-#        print("is string")
-        value = re.sub(r'\\$','',data_dict[i][j])
-      else:
-        print("is snot tring")
-        value = data_dict[i][j]
-      if (value == "'"):
-        value = "\"\""
+      if (j == "description"):
+         print("*************************")
+         print("INTERNAL SERVER ERROR ")
+         print(serial)
+         print(data_dict[i])
+         print("*************************")
+      else: 
+        if (isinstance(data_dict[i][j],str)):
+#          print("is string")
+          value = re.sub(r'\\$','',data_dict[i][j])
+        else:
+#          print("is snot tring")
+          value = data_dict[i][j]
+        if (value == "'"):
+          value = "\"\""
       
 
-      queryU1 = "INSERT INTO central_tools.variables (variable_name,customer_id,value,serial,last_refreshed) VALUES ('{0}','{1}','{2}','{3}',now())".format(variable_name,central_info['customer_id'],value,serial)
-      query = queryU1 + " ON DUPLICATE KEY UPDATE  value = '{0}', last_refreshed = now()".format(value)
+        queryU1 = "INSERT INTO central_tools.variables (variable_name,customer_id,value,serial,last_refreshed) VALUES ('{0}','{1}','{2}','{3}',now())".format(variable_name,central_info['customer_id'],value,serial)
+        query = queryU1 + " ON DUPLICATE KEY UPDATE  value = '{0}', last_refreshed = now()".format(value)
 
-      print(query)
+#        print(query)
 
-      cursor.execute(query)
-      cnx.commit()
+        cursor.execute(query)
+        cnx.commit()
       
 # remove any old variables over 7 days old
 #      query = "DELETE FROM central_tools.variables WHERE last_refreshed < now() - INTERVAL 7 day"

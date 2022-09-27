@@ -245,7 +245,7 @@ def update_tvariable(site_id, _sys_serial, _sys_lan_mac, variable, value):
   qparams = { 
   }   
 
-  response = requests.request("POST", api_url, headers=qheaders, json=data)
+  response = requests.request("PATCH", api_url, headers=qheaders, json=data)
     
 
   return
@@ -386,7 +386,10 @@ def get_stack_conductor(request, stack_name):
 @login_required(login_url="/login/")
 def set_variable(request, device_serial, variable, value ):
 
-  data_set = { "total": 1, "variables": { variable: value } }
+  variables = get_variables(request, device_serial)
+  device_mac=variables['data']['variables']['_sys_lan_mac']
+  print(device_mac)
+  data_set = { "total": 1, "variables": { "_sys_serial": device_serial, "_sys_lan_mac": device_mac, variable: value } }
   data_dump  = json.dumps(data_set)
   data = json.loads(data_dump)
 
@@ -413,6 +416,10 @@ def set_variable(request, device_serial, variable, value ):
 
   query_url = central_url + "/configuration/v1/devices/" + device_serial + "/template_variables"
   response = requests.request("PATCH", query_url, headers=qheaders, json=data)
+  print(query_url)
+  print(qheaders)
+  print(qparams)
+  print(data)
   print("Set_variable response = ")
   print(response)
   print(response.encoding)
