@@ -173,6 +173,9 @@ if args.infile is not None:
   for line in content:
      print("Serial #:",line)
      list1 = get_macaddr(central_info,line.strip())
+     print("************")
+     print(list1)
+     print("************")
      data_dict.extend(list1)
    
 else:
@@ -208,7 +211,7 @@ for x in data_dict:
    if count == 1000:
 #      print(temp_dict)
       print("STOP, Hammer time")
-      tfile = tempfile.NamedTemporaryFile(mode="w+",delete=True)
+      tfile = tempfile.NamedTemporaryFile(mode="w+",delete=False)
       json.dump(temp_dict, tfile)
       tfile.flush()
       response = set_variable(central_info,tfile)
@@ -225,7 +228,7 @@ for x in data_dict:
       count = 1
 
 # clean up any remaining records
-tfile = tempfile.NamedTemporaryFile(mode="w+",delete=True)
+tfile = tempfile.NamedTemporaryFile(mode="w+",delete=False)
 #print(temp_dict)
 json.dump(temp_dict, tfile)
 tfile.flush()

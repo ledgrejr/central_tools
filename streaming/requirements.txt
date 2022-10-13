@@ -1,0 +1,7 @@
+gevent
+greenlet
+protobuf
+six
+requests
+websocket
+websocket-client

@@ -96,4 +96,4 @@ def test_central(scraperID = "scraper"):
   return central_info_func
   
  
-
+print(test_central(scraperID="bob"))
